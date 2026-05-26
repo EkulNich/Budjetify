@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "budjetify-app",
-    "slug": "budjetify-app",
+    "name": "Budgetify",
+    "slug": "budgetify",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "budjetifyapp",
+    "scheme": "budgetifyapp",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon"
@@ -17,7 +17,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.budgetifyapp"
     },
     "web": {
       "output": "static",
@@ -36,11 +37,17 @@
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true
-      //"reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b4f982eb-9874-4f56-aaa3-f0f26bade131"
+      }
     }
   }
 }
