@@ -17,6 +17,7 @@
     "@react-navigation/elements": "^2.9.10",
     "@react-navigation/native": "^7.1.8",
     "@supabase/supabase-js": "^2.106.1",
+    "dotenv": "^17.4.2",
     "expo": "~54.0.35",
     "expo-constants": "~18.0.13",
     "expo-crypto": "~15.0.9",

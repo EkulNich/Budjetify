@@ -15,7 +15,7 @@ GoogleSignin.configure({
   iosClientId:
     "530067833499-acm4u36k4a8n3ehni1q9rmchrp6ml4b5.apps.googleusercontent.com",
   webClientId:
-    "530067833499-h08hgrh89f2cnf6betq7n45fo7uhu9ib.apps.googleusercontent.com",
+    "530067833499-kft423v0th9oltpji8gbanmo958qjoll.apps.googleusercontent.com",
   scopes: ["profile", "email"],
 });
 
