@@ -32,7 +32,7 @@ export default function LoginScreen() {
   const handleSignOut = async () => {
     await GoogleSignin.signOut();
     await supabase.auth.signOut();
-    setIsSignedIn(false);
+    router.replace("/login");
   };
 
   return (
@@ -56,7 +56,20 @@ export default function LoginScreen() {
                   provider: "google",
                   token: response.data.idToken,
                 });
-                if (!error) {
+                if (!error && data.user) {
+                  const { error: profileError } = await supabase
+                    .from("profiles")
+                    .upsert({
+                      id: data.user.id,
+                      username: data.user.user_metadata.full_name,
+                      monthly_budget: 0,
+                      monthly_salary: 0,
+                    });
+
+                  if (profileError) {
+                    console.error("Profile error:", profileError.message);
+                  }
+
                   router.replace("/(tabs)/home");
                 }
                 console.log(error, data);

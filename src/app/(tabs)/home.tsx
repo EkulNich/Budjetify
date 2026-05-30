@@ -9,8 +9,8 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useEffect } from "react";
 import { TouchableOpacity } from "react-native";
 
 function getDevMenuHint() {
@@ -34,6 +34,18 @@ function getDevMenuHint() {
 
 export default function HomeScreen() {
   const router = useRouter();
+  useFocusEffect(
+    useCallback(() => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!session) {
+          setTimeout(() => {
+            router.replace("/login");
+          }, 100);
+        }
+      });
+    }, []),
+  );
+
   useEffect(() => {
     const checkSupabase = async () => {
       const { data, error } = await supabase.from("categories").select("*");
