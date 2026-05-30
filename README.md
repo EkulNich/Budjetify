@@ -1,56 +1,98 @@
-# Welcome to your Expo app 👋
+# Budgetify 🐷
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native mobile app that helps users build better spending habits by tracking expenses, setting spending limits, and translating money into hours of work.
 
-## Get started
+---
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+**Spending Limits** — Set how much you want to spend for an event or over a time frame (daily, weekly, monthly) and track whether you stick to it.
 
-2. Start the app
+**Expense Tracker** — Log and review your expenses over time to understand your spending patterns.
 
-   ```bash
-   npx expo start
-   ```
+**Hours of Work** — Before adding an expense, see how many hours of work it costs you based on your salary. Helps you decide if it's really worth it.
 
-In the output, you'll find options to open the app in a
+**Accountability** _(coming soon)_ — Share your progress with friends or family, send congrats for streaks, and keep each other in check.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Tech Stack
 
-## Get a fresh project
+- **Frontend** — React Native (Expo), Expo Router, TypeScript
+- **Backend** — Supabase (Postgres, Auth, Row Level Security)
+- **Authentication** — Google Sign-In via `@react-native-google-signin/google-signin` + Supabase Auth
 
-When you're ready, run:
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js
+- Expo CLI
+- A Supabase project with Google Auth enabled
+
+### Installation
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Environment Variables
 
-### Other setup steps
+Create a `.env` file in the project root:
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+```
+EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_publishable_key
+```
 
-## Learn more
+### Run the app
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+npx expo start
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+## Database Schema
 
-Join our community of developers creating universal apps.
+Three core tables in Supabase, all with Row Level Security enabled:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+**profiles** — one row per user, stores `username`, `monthly_salary`, `monthly_budget`. Primary key `id` links to `auth.users.id`.
+
+**expenses** — individual expense records with `amount`, `description`, and optional `category`. Linked to `profiles` via `user_id`.
+
+**spending_limits** — per-category budget caps with `limit_amount` and `period` (daily / weekly / monthly / event).
+
+RLS policies enforce `auth.uid() = user_id` on all tables — users can only read and write their own data.
+
+---
+
+## Authentication Flow
+
+1. User taps Sign in with Google
+2. Native Google OAuth screen appears
+3. Google issues an ID token
+4. App calls `supabase.auth.signInWithIdToken` with the token
+5. Supabase validates the token and returns a session
+6. A profile row is created for new users
+7. App navigates to the home screen
+
+Session tokens are persisted on device via `AsyncStorage` and auto-refreshed before expiry.
+
+---
+
+## Building the APK
+
+```bash
+eas build --platform android --profile preview
+```
+
+Requires an [Expo](https://expo.dev) account and EAS CLI installed (`npm install -g eas-cli`).
+
+---
+
+## Team
+
+Built by Luke and Shreejith as part of Orbital 2026.

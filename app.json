@@ -1,22 +1,27 @@
 {
   "expo": {
-    "name": "Budgetify",
-    "slug": "budgetify",
+    "name": "budgetify",
+    "slug": "budjetify-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/budgetify_appIcon.png",
     "scheme": "budgetifyapp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/images/budgetify_appIcon.png",
+      "bundleIdentifier": "com.anonymous.budgetifyapp",
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.530067833499-acm4u36k4a8n3ehni1q9rmchrp6ml4b5"
+            ]
+          }
+        ]
+      }
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
+      "icon": "./assets/images/budgetify_appIcon.png",
       "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.budgetifyapp"
     },
