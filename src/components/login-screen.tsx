@@ -57,19 +57,26 @@ export default function LoginScreen() {
                   token: response.data.idToken,
                 });
                 if (!error && data.user) {
-                  const { error: profileError } = await supabase
+                  const { data: existing } = await supabase
                     .from("profiles")
-                    .upsert({
-                      id: data.user.id,
-                      username: data.user.user_metadata.full_name,
-                      monthly_budget: 0,
-                      monthly_salary: 0,
-                    });
+                    .select("id")
+                    .eq("id", data.user.id)
+                    .single();
 
-                  if (profileError) {
-                    console.error("Profile error:", profileError.message);
+                  if (!existing) {
+                    const { error: profileError } = await supabase
+                      .from("profiles")
+                      .insert({
+                        id: data.user.id,
+                        username: data.user.user_metadata.full_name,
+                        monthly_budget: 0,
+                        monthly_salary: 0,
+                      });
+
+                    if (profileError) {
+                      console.error("Profile error:", profileError.message);
+                    }
                   }
-
                   router.replace("/(tabs)/home");
                 }
                 console.log(error, data);

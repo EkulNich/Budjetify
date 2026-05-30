@@ -1,5 +1,7 @@
+import { supabase } from "@/lib/supabase";
 import { useState } from "react";
 import {
+  Alert,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -15,14 +17,42 @@ import { useRef } from "react";
 export default function AddScreen() {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
   const scheme = useColorScheme();
   const colors = Colors[scheme ?? "light"];
   const descriptionRef = useRef<TextInput>(null);
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!amount) return;
     console.log("Adding expense:", { amount: parseFloat(amount), description });
-    // TODO: save to Supabase
+
+    setLoading(true);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      Alert.alert("Error", "Not logged in");
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await supabase.from("expenses").insert([
+      {
+        amount: parseFloat(amount),
+        description,
+        user_id: user.id,
+      },
+    ]);
+
+    if (error) {
+      Alert.alert("Error", error.message);
+    } else {
+      Alert.alert("Saved!", "Expense added.");
+      setAmount("");
+      setDescription("");
+    }
+
+    setLoading(false);
   };
 
   return (

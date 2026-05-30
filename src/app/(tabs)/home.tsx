@@ -10,7 +10,7 @@ import { ThemedView } from "@/components/themed-view";
 import { BottomTabInset, MaxContentWidth, Spacing } from "@/constants/theme";
 import { Image } from "expo-image";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native";
 
 function getDevMenuHint() {
@@ -34,6 +34,13 @@ function getDevMenuHint() {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [stats, setStats] = useState({
+    totalSpent: 0,
+    remaining: 0,
+    percentSpent: 0,
+    budget: 0,
+  });
+
   useFocusEffect(
     useCallback(() => {
       supabase.auth.getSession().then(({ data: { session } }) => {
@@ -45,6 +52,48 @@ export default function HomeScreen() {
       });
     }, []),
   );
+
+  useFocusEffect(
+    useCallback(() => {
+      getMonthlyStats();
+    }, []),
+  );
+
+  const getMonthlyStats = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (!profile) return;
+
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    const { data: expenses } = await supabase
+      .from("expenses")
+      .select("amount")
+      .gte("created_at", startOfMonth.toISOString());
+
+    const totalSpent =
+      expenses?.reduce((sum, e) => sum + Number(e.amount), 0) ?? 0;
+    const remaining = Number(profile.monthly_budget) - totalSpent;
+    const percentSpent = (totalSpent / Number(profile.monthly_budget)) * 100;
+
+    setStats({
+      totalSpent,
+      remaining,
+      percentSpent,
+      budget: profile.monthly_budget,
+    });
+  };
 
   useEffect(() => {
     const checkSupabase = async () => {
@@ -77,7 +126,7 @@ export default function HomeScreen() {
           />
         </ThemedView>
 
-        <BudgetBar spendingLimit={2000} outflow={157.5} />
+        <BudgetBar spendingLimit={stats.budget} outflow={stats.totalSpent} />
       </SafeAreaView>
     </ThemedView>
   );

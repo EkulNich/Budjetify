@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+    Alert,
     StyleSheet,
     TextInput,
     TouchableOpacity,
@@ -10,18 +11,43 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Colors, Spacing } from "@/constants/theme";
+import { supabase } from "@/lib/supabase";
 
 export default function ProfileScreen() {
   const [monthlyBudget, setMB] = useState("");
   const scheme = useColorScheme();
   const colors = Colors[scheme ?? "light"];
+  const [loading, setLoading] = useState(false);
 
-  const handleProfile = () => {
+  const handleProfile = async () => {
     if (!monthlyBudget) return;
     console.log("Adding monthly budget:", {
       monthlyBudget: parseFloat(monthlyBudget),
     });
-    // TODO: save to Supabase
+
+    setLoading(true);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      Alert.alert("Error", "Not logged in");
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({ monthly_budget: parseFloat(monthlyBudget) })
+      .eq("id", user.id);
+
+    if (error) {
+      Alert.alert("Error", error.message);
+    } else {
+      Alert.alert("Saved!", "Monthly budget updated.");
+      setMB("");
+    }
+
+    setLoading(false);
   };
 
   return (
